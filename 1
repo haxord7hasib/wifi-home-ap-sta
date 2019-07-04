@@ -1,0 +1,138 @@
+
+#include <ESP8266WiFi.h>
+#include <WiFiClient.h> 
+#include <ESP8266WebServer.h>
+#include <ESP8266mDNS.h>
+
+MDNSResponder mdns;
+/* Set these to your desired credentials. */
+const char *ssid = "HOME";
+const char *password = "awse2313";
+String webPage = "";
+
+int gpio0_pin = 0;
+int gpio2_pin = 2;
+int gpio4_pin=  3;
+int gpio3_pin=  1;
+
+
+ESP8266WebServer server(80);
+
+/* Just a little test message.  Go to http://192.168.4.1 in a web browser
+ * connected to this access point to see it.
+ */
+void handleRoot() {
+
+
+server.send(200, "text/html", webPage);
+
+ 
+}
+
+void setup() {
+
+
+  
+webPage +="<html>\
+  <head><title>HAasib wifi bot</title>\<marquee direction= left scroll amount= 0> <font color=#00DCFF face=courier size=9> IOT CONTROL HOME AUTOMATION HASIBS TECHS</font> </marquee>\
+    <style>\ button {background-color: #FFC300  ; margin:5px;border: 7;border-radius: 5px 10px / 10px; padding-right: 7px;box-shadow: 0 28px 56px 0 rgba(0,0,0,0.2), 0 60px 20px 0 rgba(0,0,0,0.19);padding: 16px 32px;text-align: center;margin-left: 20px;display: inline-block; box-shadow: 0 9px #999;transform: translateY(4px);font-size: 20px;margin: 40px 20px;-webkit-transition-duration: 0.4s;cursor: pointer;}\
+    button:hover {background-color:  #f12e25 ;color: white;}\
+     body {  font-family: Arial,; Color:#f4d319 ;  background-image:  url(https://scontent-sin6-1.xx.fbcdn.net/v/t1.0-9/16174606_801579456662923_910802725039029603_n.jpg?oh=21c81f0be77d4bc08cdc9f0a51194b92&oe=5910CCF4); background-size: 1400px 800px;}\
+    </style>\
+  </head>\<center><a href=\"socket1On\"><button><h2>ROUTER </h2></button></a>&nbsp;<a href=\"socket1Off\"><button><h2>OFF<h2></button></a>\  <a href=\"socket2On\"><button><h2>Soundbox</h2></button></a>&nbsp;<a href=\"socket2Off\"><button><h2>OFF</h2></button></a></center>\<body>\
+  </body>\
+<center><a href=\"socket3On\"><button><h2>Switch-3[ON] </h2></button></a>&nbsp;<a href=\"socket3Off\"><button><h2>OFF</h2></button></a><a href=\"socket4On\"><button><h2>Switch4[ON] </button></h2></a>&nbsp;<a href=\"socket4Off\"><button><h2>OFF</h2></button></a></center>\
+<center><h1>DROID TEN PRODUCTS, DROID LAB BANGLASESH </h1></center></html>";
+
+
+
+  
+	delay(1000);
+	Serial.begin(115200);
+	Serial.println();
+	Serial.print("Configuring access point...");
+	/* You can remove the password parameter if you want the AP to be open. */
+	WiFi.softAP(ssid, password);
+
+	IPAddress myIP = WiFi.softAPIP();
+	Serial.print("AP IP address: ");
+	Serial.println(myIP);
+	server.on("/", handleRoot);
+	server.begin();
+	Serial.println("HTTP server started");
+
+  pinMode(gpio0_pin, OUTPUT);
+  digitalWrite(gpio0_pin, LOW);
+  pinMode(gpio2_pin, OUTPUT);
+  digitalWrite(gpio2_pin, LOW);
+  pinMode(gpio4_pin, OUTPUT);
+ digitalWrite(gpio4_pin, LOW);
+  pinMode(gpio3_pin, OUTPUT);
+  digitalWrite(gpio3_pin, LOW);
+  
+  delay(1000);
+ 
+  
+  if (mdns.begin("esp8266", WiFi.localIP())) {
+    Serial.println("MDNS responder started");
+  }
+
+
+   server.on("/", [](){
+    server.send(200, "text/html", webPage);
+  });
+  server.on("/socket1On", [](){
+    server.send(200, "text/html", webPage);
+    digitalWrite(gpio0_pin, LOW);
+    delay(1000);
+  });
+  server.on("/socket1Off", [](){
+    server.send(200, "text/html", webPage);
+    digitalWrite(gpio0_pin, HIGH);
+    delay(1000); 
+  });
+  server.on("/socket2On", [](){
+    server.send(200, "text/html", webPage);
+    digitalWrite(gpio2_pin, LOW);
+    delay(1000);
+  });
+  server.on("/socket2Off", [](){
+    server.send(200, "text/html", webPage);
+    digitalWrite(gpio2_pin, HIGH);
+    delay(1000); 
+  });
+
+
+   server.on("/socket3On", [](){
+    server.send(200, "text/html", webPage);
+    digitalWrite(gpio4_pin, LOW);
+    delay(1000);
+  });
+  server.on("/socket3Off", [](){
+    server.send(200, "text/html", webPage);
+    digitalWrite(gpio4_pin, HIGH);
+    delay(1000); 
+  });
+ server.on("/socket4On", [](){
+    server.send(200, "text/html", webPage);
+    digitalWrite(gpio3_pin, LOW);
+    delay(1000);
+  });
+  server.on("/socket4Off", [](){
+    server.send(200, "text/html", webPage);
+    digitalWrite(gpio3_pin, HIGH);
+    delay(1000); 
+  });
+
+  
+  server.begin();
+  Serial.println("HTTP server started");
+
+
+
+  
+}
+
+void loop() {
+	server.handleClient();
+}
