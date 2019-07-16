@@ -58,7 +58,6 @@ void  loop ()
     left();
   Serial.println ("left");
   }
-  delay(500);
   }
 void forward() {
   digitalWrite(motor1Left,HIGH);
